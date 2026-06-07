@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TeleSWEBench — Telecom Software Engineering Benchmark</title>
+  <meta name="description" content="TeleSWEBench: a commit-driven benchmark for evaluating LLM-powered software engineering in telecommunications.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #f8f9fb;
+      --surface: #ffffff;
+      --ink: #111827;
+      --muted: #5b6472;
+      --accent: #1d4ed8;
+      --accent-soft: #dbeafe;
+      --border: #e5e7eb;
+      --highlight: #ecfdf5;
+      --highlight-border: #a7f3d0;
+      --shadow: 0 1px 3px rgba(17, 24, 39, 0.08), 0 8px 24px rgba(17, 24, 39, 0.06);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: "Inter", system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+      line-height: 1.65;
+    }
+
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    .wrap {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 1.5rem 4rem;
+    }
+
+    header {
+      background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 55%, #1d4ed8 100%);
+      color: #fff;
+      padding: 3.5rem 0 3rem;
+      margin-bottom: 2.5rem;
+    }
+
+    header .wrap { padding-bottom: 0; }
+
+    .eyebrow {
+      font-size: 0.85rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      opacity: 0.8;
+      margin-bottom: 0.75rem;
+    }
+
+    h1 {
+      font-size: clamp(2rem, 4vw, 2.75rem);
+      line-height: 1.15;
+      font-weight: 700;
+      margin-bottom: 1rem;
+    }
+
+    .subtitle {
+      font-size: 1.1rem;
+      max-width: 52rem;
+      opacity: 0.92;
+      margin-bottom: 1.5rem;
+    }
+
+    .hero-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.55rem 1rem;
+      border-radius: 999px;
+      font-weight: 600;
+      font-size: 0.92rem;
+      border: 1px solid transparent;
+      transition: transform 0.15s ease, background 0.15s ease;
+    }
+
+    .btn:hover { text-decoration: none; transform: translateY(-1px); }
+
+    .btn-primary {
+      background: #fff;
+      color: #1e3a8a;
+    }
+
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.12);
+      color: #fff;
+      border-color: rgba(255, 255, 255, 0.28);
+    }
+
+    section {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      box-shadow: var(--shadow);
+      padding: 1.75rem 1.9rem;
+      margin-bottom: 1.75rem;
+    }
+
+    h2 {
+      font-size: 1.45rem;
+      margin-bottom: 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 2px solid var(--accent-soft);
+    }
+
+    h3 {
+      font-size: 1.05rem;
+      margin: 1.25rem 0 0.5rem;
+      color: var(--ink);
+    }
+
+    p, li { color: var(--muted); }
+    p + p { margin-top: 0.85rem; }
+
+    ul { margin: 0.75rem 0 0 1.25rem; }
+    li + li { margin-top: 0.35rem; }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 0.9rem;
+      margin: 1.25rem 0 0.25rem;
+    }
+
+    .stat {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 0.9rem 1rem;
+      text-align: center;
+    }
+
+    .stat strong {
+      display: block;
+      font-size: 1.5rem;
+      color: var(--ink);
+      line-height: 1.2;
+    }
+
+    .stat span {
+      font-size: 0.82rem;
+      color: var(--muted);
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+      margin-top: 1rem;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.92rem;
+      min-width: 760px;
+    }
+
+    thead th {
+      background: #f3f4f6;
+      color: var(--ink);
+      font-weight: 600;
+      text-align: center;
+      padding: 0.75rem 0.65rem;
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+    }
+
+    thead th:first-child,
+    thead th:nth-child(2) { text-align: left; }
+
+    tbody td {
+      padding: 0.7rem 0.65rem;
+      border-bottom: 1px solid var(--border);
+      text-align: center;
+      font-variant-numeric: tabular-nums;
+    }
+
+    tbody td:first-child,
+    tbody td:nth-child(2) {
+      text-align: left;
+      font-weight: 500;
+      color: var(--ink);
+    }
+
+    tbody tr:last-child td { border-bottom: none; }
+    tbody tr:hover { background: #fafbfc; }
+
+    tbody tr.top td { background: var(--highlight); }
+    tbody tr.top td:first-child { border-left: 3px solid #10b981; }
+
+    code, .mono {
+      font-family: "JetBrains Mono", ui-monospace, monospace;
+      font-size: 0.88em;
+      background: #f3f4f6;
+      padding: 0.12rem 0.35rem;
+      border-radius: 4px;
+      color: #1f2937;
+    }
+
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 0.85rem;
+      margin-top: 0.75rem;
+    }
+
+    .metric-card {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 0.85rem 1rem;
+    }
+
+    .metric-card strong {
+      display: block;
+      color: var(--ink);
+      margin-bottom: 0.2rem;
+    }
+
+    figure {
+      margin: 1.25rem 0 0;
+      text-align: center;
+    }
+
+    figure img {
+      max-width: 100%;
+      height: auto;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: #fff;
+    }
+
+    figcaption {
+      margin-top: 0.75rem;
+      font-size: 0.9rem;
+      color: var(--muted);
+      text-align: left;
+      line-height: 1.55;
+    }
+
+    .submission {
+      background: linear-gradient(180deg, #eff6ff 0%, #ffffff 100%);
+      border-color: #bfdbfe;
+    }
+
+    .submission ol {
+      margin: 0.75rem 0 0 1.25rem;
+      color: var(--muted);
+    }
+
+    footer {
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.88rem;
+      padding: 1rem 0 2rem;
+    }
+
+    @media (max-width: 640px) {
+      section { padding: 1.25rem 1.1rem; }
+      header { padding: 2.5rem 0 2rem; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <div class="eyebrow">NC State · UC San Diego</div>
+    <h1>TeleSWEBench</h1>
+    <p class="subtitle">
+      A commit-driven benchmark for evaluating LLM-powered software engineering
+      in telecommunications — mined from real <code>srsRAN 5G</code> developer commits
+      with executable unit tests and hierarchical LLM-as-a-Judge scoring.
+    </p>
+    <div class="hero-links">
+      <a class="btn btn-primary" href="https://arxiv.org/abs/2606.05001" target="_blank" rel="noopener">Read the paper (arXiv)</a>
+      <a class="btn btn-secondary" href="https://github.com/prnshv/TeleSWEBench" target="_blank" rel="noopener">Benchmarking suite</a>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <section id="about">
+    <h2>What is TeleSWEBench?</h2>
+    <p>
+      Modern telecom networks are increasingly software-defined. Tools like O-RAN and AI-RAN
+      depend on complex, mathematically rigorous wireless stacks such as
+      <strong>srsRAN 5G</strong>. General-purpose coding benchmarks do not capture the
+      stateful logic and strict requirements of this domain.
+    </p>
+    <p>
+      <strong>TeleSWEBench</strong> fills that gap. We mine real developer commits from the
+      srsRAN 5G repository and distill them into <strong>734 structured tasks</strong> across
+      three difficulty tiers (Easy, Medium, Difficult). Each task ships with executable unit
+      tests. Evaluation runs in two stages:
+    </p>
+    <ul>
+      <li><strong>Stage 1 — Localization:</strong> Did the agent edit the right files?</li>
+      <li><strong>Stage 2 — Correctness:</strong> Do patches pass unit tests and TeleJudge semantic review?</li>
+    </ul>
+
+    <div class="stats">
+      <div class="stat"><strong>734</strong><span>benchmark tasks</span></div>
+      <div class="stat"><strong>3</strong><span>difficulty tiers</span></div>
+      <div class="stat"><strong>7+</strong><span>evaluated models</span></div>
+      <div class="stat"><strong>3</strong><span>ASE frameworks</span></div>
+    </div>
+  </section>
+
+  <section id="stage1">
+    <h2>Stage 1 Localization (Cumulative)</h2>
+    <p>
+      Results below report <strong>cumulative</strong> localization performance across all
+      difficulty tiers. Runs that ended in <code>timeout</code> are excluded. All AIDER entries
+      use the NRP provider unless noted otherwise.
+    </p>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>ASE Framework</th>
+            <th>Model</th>
+            <th>EM (%)</th>
+            <th>PM (%)</th>
+            <th>OA (%)</th>
+            <th>NM (%)</th>
+            <th>NC (%)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="top">
+            <td>OpenHands</td>
+            <td>Qwen3</td>
+            <td>24.5</td>
+            <td>42.8</td>
+            <td>5.4</td>
+            <td>2.1</td>
+            <td>25.2</td>
+          </tr>
+          <tr>
+            <td>AIDER</td>
+            <td>QwenCoder-2.5</td>
+            <td>17.4</td>
+            <td>8.1</td>
+            <td>1.8</td>
+            <td>34.8</td>
+            <td>37.8</td>
+          </tr>
+          <tr>
+            <td>AIDER</td>
+            <td>Qwen3</td>
+            <td>14.0</td>
+            <td>16.5</td>
+            <td>1.5</td>
+            <td>9.2</td>
+            <td>58.7</td>
+          </tr>
+          <tr>
+            <td>AIDER</td>
+            <td>GPT-OSS</td>
+            <td>11.0</td>
+            <td>13.8</td>
+            <td>1.1</td>
+            <td>8.4</td>
+            <td>65.7</td>
+          </tr>
+          <tr>
+            <td>Claude Code</td>
+            <td>Qwen3</td>
+            <td>9.2</td>
+            <td>12.0</td>
+            <td>0.7</td>
+            <td>0.1</td>
+            <td>78.0</td>
+          </tr>
+          <tr>
+            <td>AIDER</td>
+            <td>Kimi-K2.5</td>
+            <td>5.3</td>
+            <td>12.6</td>
+            <td>0.2</td>
+            <td>4.6</td>
+            <td>77.3</td>
+          </tr>
+          <tr>
+            <td>AIDER</td>
+            <td>Qwen3-small</td>
+            <td>3.5</td>
+            <td>8.8</td>
+            <td>0.1</td>
+            <td>5.0</td>
+            <td>82.6</td>
+          </tr>
+          <tr>
+            <td>AIDER</td>
+            <td>Gemma4</td>
+            <td>2.8</td>
+            <td>7.2</td>
+            <td>0.0</td>
+            <td>3.2</td>
+            <td>86.8</td>
+          </tr>
+          <tr>
+            <td>AIDER</td>
+            <td>GLM-4.7</td>
+            <td>1.5</td>
+            <td>5.9</td>
+            <td>0.0</td>
+            <td>0.4</td>
+            <td>92.2</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Metric definitions</h3>
+    <p>
+      Localization compares the set of files an agent edited (<em>P</em>) against the
+      ground-truth file set (<em>T</em>) for each task. Each task receives exactly one label:
+    </p>
+    <div class="metrics-grid">
+      <div class="metric-card">
+        <strong>EM — Exact Match</strong>
+        Predicted files exactly equal ground truth (<em>P = T</em>). Best-case localization.
+      </div>
+      <div class="metric-card">
+        <strong>PM — Partial Match</strong>
+        Some but not all ground-truth files appear in <em>P</em>; the agent found part of the right scope.
+      </div>
+      <div class="metric-card">
+        <strong>OA — Over Addressed</strong>
+        All ground-truth files are in <em>P</em>, plus extra files the agent also touched.
+      </div>
+      <div class="metric-card">
+        <strong>NM — No Match</strong>
+        Wrong files or no overlap with ground truth (excluding empty/no-change runs).
+      </div>
+      <div class="metric-card">
+        <strong>NC — No Changes</strong>
+        Agent produced no file edits, or the run timed out without edits.
+      </div>
+    </div>
+  </section>
+
+  <section id="results">
+    <h2>Stage 2 — Correctness &amp; Framework Comparison</h2>
+
+    <figure>
+      <img src="images/spr.png" alt="Scatter plot of models by UAR and TAR with SRP annotations">
+      <figcaption>
+        <strong>Figure 1.</strong> Each marker represents a model plotted by
+        <em>UAR</em> (Unweighted Average Recall) on the x-axis and
+        <em>TAR</em> (Total Acceptance Rate) on the y-axis; annotations report
+        <em>SRP</em> (Shippable Rate Percentage). <em>TAR</em> measures the share of
+        exact-match tasks accepted by TeleJudge; <em>UAR</em> captures recall across
+        judged verdicts; <em>SRP</em> is the fraction of tasks producing shippable changes
+        (passing both judge and tests where applicable).
+      </figcaption>
+    </figure>
+
+    <figure>
+      <img src="images/framework_comparison.png" alt="OpenHands vs Claude Code comparison across localization and correctness metrics">
+      <figcaption>
+        <strong>Figure 2.</strong> Performance comparison between OpenHands and Claude Code
+        ASE frameworks using the <code>qwen3</code> backbone. Left panel: Stage 1 localization
+        (EM, PM, OA, NM, NC). Right panel: Stage 2 correctness (TAR, UAR, SRP).
+        OpenHands achieves stronger localization; both frameworks reach comparable SRP on correctness.
+      </figcaption>
+    </figure>
+  </section>
+
+  <section id="submit" class="submission">
+    <h2>Submit your results</h2>
+    <p>
+      We welcome community submissions. Run the official benchmarking suite, then email
+      the generated run artefacts for verification. Verified results will be added to this page.
+    </p>
+    <ol>
+      <li>
+        Clone and install the suite:
+        <a href="https://github.com/prnshv/TeleSWEBench" target="_blank" rel="noopener">github.com/prnshv/TeleSWEBench</a>
+      </li>
+      <li>
+        Run a full benchmark (all difficulties recommended):
+        <code>python3 -m tele_swebench.cli run --framework &lt;framework&gt; --provider &lt;provider&gt; --model &lt;model&gt;</code>
+        This creates <code>outputs/runs/&lt;run_id&gt;/</code> with:
+        <ul>
+          <li><code>config.json</code>, <code>manifest.json</code>, <code>summary.json</code> — run metadata</li>
+          <li><code>experiments/</code> — per-task JSON records (required for evaluation)</li>
+          <li><code>results/</code> — generated patches per task</li>
+          <li><code>logs/runner.log</code> and <code>logs/tests.json</code> — runner and test logs</li>
+        </ul>
+      </li>
+      <li>
+        Optionally run evaluation on the same run directory:
+        <code>python3 -m tele_swebench.cli eval --directory outputs/runs/&lt;run_id&gt; --mode all --copilot-model &lt;model&gt;</code>
+        This adds <code>evaluation/report.json</code>, <code>evaluation/telejudge_outputs/</code>, and
+        <code>logs/telejudge/</code>.
+      </li>
+      <li>
+        Archive and email the run directory to
+        <a href="mailto:prgajajr@ncsu.edu">prgajajr@ncsu.edu</a>.
+        Include your ASE framework, model, and provider in the message.
+        You do <strong>not</strong> need to send <code>workspaces/</code> (checked-out repos are large and reproducible).
+      </li>
+      <li>
+        After we verify the run, your result will be added to the table on this page.
+      </li>
+    </ol>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    TeleSWEBench ·
+    <a href="https://arxiv.org/abs/2606.05001">arXiv:2606.05001</a> ·
+    <a href="https://github.com/prnshv/TeleSWEBench">GitHub</a>
+  </div>
+</footer>
+
+</body>
+</html>
